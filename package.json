@@ -1,0 +1,31 @@
+{
+  "name": "oidc",
+  "version": "1.0.0",
+  "description": "Making my own oidc for logging different websites that I am going to make",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "keywords": [
+    "OIDC",
+    "Express",
+    "Server",
+    "Backend",
+    "TypeScript"
+  ],
+  "author": "Mehtab Hussain",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.0.1",
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "uuid": "^14.0.1"
+  }
+}
