@@ -253,8 +253,10 @@
 
         // Form submission (demo)
         const form = document.getElementById('registerForm');
-        form.addEventListener('submit', (e) => {
+
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
+            console.log('indese---------')          //fix it
             
             const username = document.getElementById('username').value;
             const email = document.getElementById('email').value;
@@ -267,22 +269,33 @@
                 
                 btn.textContent = 'Creating account...';
                 btn.disabled = true;
-                
-                setTimeout(() => {
-                    alert('✅ Account created successfully! (Demo)');
-                    btn.textContent = originalText;
-                    btn.disabled = false;
-                    form.reset();
-                }, 1500);
             }
+
+
+            try {
+                const response = await fetch('/v1/authenticate/sign-up',{
+                    method:'POST',
+                    headers:{
+                        'Content-Type':'application/json'
+                    },
+                    body:JSON.stringify({
+                        username,email,password
+                    })
+                })
+                let data = await response.json()
+                console.log(data)
+            } catch (error) {
+                console.error(error)
+            }
+            
         });
 
         // Keyboard support
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                form.dispatchEvent(new Event('submit'));
-            }
-        });
+        // document.addEventListener('keydown', (e) => {
+        //     if (e.key === 'Enter') {
+        //         form.dispatchEvent(new Event('submit'));
+        //     }
+        // });
     </script>
 </body>
 </html>
