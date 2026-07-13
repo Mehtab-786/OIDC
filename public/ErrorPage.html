@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Authorization Error</title>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      body {
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #f4f6fb;
+        padding: 20px;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 950px;
+        background: #fff;
+        border-radius: 14px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+      }
+
+      .header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 22px 32px;
+        border-bottom: 1px solid #ececec;
+      }
+
+      .header h2 {
+        font-size: 26px;
+        font-weight: 500;
+        color: #1f2937;
+      }
+
+      .content {
+        display: flex;
+        gap: 70px;
+        padding: 55px;
+      }
+
+      .left,
+      .right {
+        flex: 1;
+      }
+
+      .left h1 {
+        font-size: 55px;
+        font-weight: 400;
+        color: #202124;
+        line-height: 1.10;
+      }
+
+      .left p {
+        margin-top: 24px;
+        font-size: 17px;
+        color: #5f6368;
+        line-height: 1.8;
+      }
+
+      .error-box {
+        background: #f9fafb;
+        border: 1px solid #d1d5db;
+        border-left: 5px solid #2563eb;
+        border-radius: 10px;
+        padding: 20px;
+      }
+
+      .error-box h3 {
+        color: #111827;
+        font-size: 18px;
+        margin-bottom: 10px;
+      }
+
+      .error-code {
+        display: inline-block;
+        background: #eef2ff;
+        color: #1d4ed8;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-family: monospace;
+        margin-top: 8px;
+      }
+
+      .help {
+        margin-top: 28px;
+        color: #5f6368;
+        line-height: 1.7;
+        font-size: 15px;
+      }
+
+      .footer {
+        margin-top: 30px;
+        display: flex;
+        gap: 15px;
+        align-items: center;
+      }
+
+      button {
+        padding: 12px 22px;
+        border: none;
+        border-radius: 8px;
+        background: #2563eb;
+        color: white;
+        font-size: 15px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+
+      button:hover {
+        background: #1d4ed8;
+      }
+
+      .status {
+        color: #6b7280;
+        font-size: 14px;
+      }
+
+      @media (max-width: 800px) {
+        .content {
+          flex-direction: column;
+          padding: 35px;
+          gap: 40px;
+        }
+
+        .left h1 {
+          font-size: 42px;
+        }
+
+        .header {
+          padding: 18px 24px;
+        }
+
+        .header h2 {
+          font-size: 22px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="header">
+        <h2>OIDC Authorization Server</h2>
+      </div>
+
+      <div class="content">
+        <div class="left">
+          <h1>
+            Access blocked
+            <br />
+            Authorization Error
+          </h1>
+
+          <p>
+            The authorization request could not be completed because the request
+            is invalid or the application is not properly configured.
+          </p>
+        </div>
+
+        <div class="right">
+          <div class="error-box">
+            <h3>Authorization Failed</h3>
+
+            <p>The application could not be authorized at this time.</p>
+
+            <div class="error-code">Error: invalid_request</div>
+          </div>
+
+          <p class="help">
+            If you are the developer of this application, verify that the client
+            registration, redirect URI, and authorization request are correctly
+            configured.
+          </p>
+
+          <div class="footer">
+            <button onclick="history.back()">Go Back</button>
+
+            <span class="status"> HTTP 400 Bad Request </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
