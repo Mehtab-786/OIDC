@@ -241,26 +241,25 @@
           </div>
         </div>
 
-        <!-- <div class="options">
-                <label class="remember">
-                    <input type="checkbox" id="remember">
-                    Remember me
-                </label>
-                <a href="#" class="forgot">Forgot password?</a>
-            </div> -->
-
         <button type="submit" class="login-btn">Sign In</button>
 
         <div class="divider">or</div>
 
         <div class="signup-link">
           Don't have an account?
-          <a href="/SignUp.html">Sign up</a>
+          <a href="/signup">Sign up</a>
         </div>
       </form>
     </div>
 
     <script>
+      const params = new URLSearchParams(window.location.search);
+      const redirect_uri = params.get("redirect_uri");
+      const client_id = params.get("client_id");
+      let signUpLink =  document.querySelector('a')
+
+      signUpLink.href = `/signup?client_id=${client_id}&redirect_uri=${redirect_uri}`
+      
       // Password visibility toggle
       const togglePassword = document.getElementById("togglePassword");
       const passwordInput = document.getElementById("password");
@@ -283,36 +282,26 @@
         const email = document.getElementById("email").value;
         const password = document.getElementById("password").value;
 
-        // if (email && password) {
-        //   // Simulate loading
-        //   const btn = document.querySelector(".login-btn");
-        //   const originalText = btn.textContent;
-
-        //   btn.textContent = "Signing in...";
-        //   btn.disabled = true;
-        // }
-
         try {
-          const response = await fetch("/v1/authenticate/sign-in", {
+          let rawResponse = await fetch("/authorize", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ email, password }),
+            body: JSON.stringify({ email, password, redirect_uri, client_id }),
           });
-          let data = await response.json();
-          console.log(data);
+          const { data } = await rawResponse.json();
+
+          if (!rawResponse.ok) {
+            console.log("Something went wrong ..");
+            return;
+          } else {
+            window.location.replace(`${redirect_uri}/?code=${data.code}`);
+          }
         } catch (error) {
           console.error(error);
         }
       });
-
-      // Keyboard support
-      // document.addEventListener('keydown', (e) => {
-      //     if (e.key === 'Enter') {
-      //         form.dispatchEvent(new Event('submit'));
-      //     }
-      // });
     </script>
   </body>
 </html>
