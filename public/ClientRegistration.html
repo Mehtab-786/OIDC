@@ -1,269 +1,285 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Register Client Application</title>
 
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family:
-          Inter,
-          Segoe UI,
-          Tahoma,
-          Geneva,
-          Verdana,
-          sans-serif;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register Client Application</title>
 
-      body {
-        background: #f4f7fb;
-        min-height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 40px 20px;
-        color: #1f2937;
-      }
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family:
+        Inter,
+        Segoe UI,
+        Tahoma,
+        Geneva,
+        Verdana,
+        sans-serif;
+    }
 
-      .container {
-        width: 100%;
-        max-width: 720px;
-      }
+    body {
+      background: #f4f7fb;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 20px;
+      color: #1f2937;
+    }
 
+    .container {
+      width: 100%;
+      max-width: 720px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e5e7eb;
+    }
+
+    .header {
+      margin-bottom: 32px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 12px;
+      background: #eef2ff;
+      color: #4338ca;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 999px;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      font-size: 30px;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      color: #6b7280;
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      font-size: 15px;
+      transition: 0.2s;
+      outline: none;
+      background: white;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: #4f46e5;
+      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
+    }
+
+    small {
+      display: block;
+      margin-top: 8px;
+      color: #6b7280;
+      line-height: 1.5;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 36px;
+    }
+
+    button {
+      border: none;
+      cursor: pointer;
+      padding: 14px 28px;
+      border-radius: 10px;
+      background: #4f46e5;
+      color: white;
+      font-size: 15px;
+      font-weight: 600;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      background: #4338ca;
+      transform: translateY(-1px);
+    }
+
+    .info {
+      margin-top: 30px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 18px;
+    }
+
+    .info h3 {
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+
+    .info ul {
+      padding-left: 18px;
+      color: #6b7280;
+    }
+
+    .info li {
+      margin-bottom: 8px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 600px) {
       .card {
-        background: #fff;
-        border-radius: 16px;
-        padding: 40px;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
-        border: 1px solid #e5e7eb;
-      }
-
-      .header {
-        margin-bottom: 32px;
-      }
-
-      .badge {
-        display: inline-block;
-        padding: 6px 12px;
-        background: #eef2ff;
-        color: #4338ca;
-        font-size: 13px;
-        font-weight: 600;
-        border-radius: 999px;
-        margin-bottom: 16px;
+        padding: 28px;
       }
 
       h1 {
-        font-size: 30px;
-        margin-bottom: 10px;
+        font-size: 24px;
       }
+    }
+  </style>
+</head>
 
-      .subtitle {
-        color: #6b7280;
-        line-height: 1.6;
-        font-size: 15px;
-      }
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="header">
+        <span class="badge">OIDC Client Registration</span>
 
-      .form-group {
-        margin-bottom: 24px;
-      }
+        <h1>Register Your Application</h1>
 
-      label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: 600;
-        font-size: 15px;
-      }
+        <p class="subtitle">
+          Register your application to obtain a Client ID and Client Secret.
+          These credentials allow your application to authenticate users
+          through this OpenID Connect Provider.
+        </p>
+      </div>
 
-      input,
-      select {
-        width: 100%;
-        padding: 14px 16px;
-        border: 1px solid #d1d5db;
-        border-radius: 10px;
-        font-size: 15px;
-        transition: 0.2s;
-        outline: none;
-        background: white;
-      }
-
-      input:focus,
-      select:focus {
-        border-color: #4f46e5;
-        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
-      }
-
-      small {
-        display: block;
-        margin-top: 8px;
-        color: #6b7280;
-        line-height: 1.5;
-      }
-
-      .actions {
-        display: flex;
-        justify-content: flex-end;
-        margin-top: 36px;
-      }
-
-      button {
-        border: none;
-        cursor: pointer;
-        padding: 14px 28px;
-        border-radius: 10px;
-        background: #4f46e5;
-        color: white;
-        font-size: 15px;
-        font-weight: 600;
-        transition: 0.2s;
-      }
-
-      button:hover {
-        background: #4338ca;
-        transform: translateY(-1px);
-      }
-
-      .info {
-        margin-top: 30px;
-        background: #f9fafb;
-        border: 1px solid #e5e7eb;
-        border-radius: 12px;
-        padding: 18px;
-      }
-
-      .info h3 {
-        font-size: 16px;
-        margin-bottom: 10px;
-      }
-
-      .info ul {
-        padding-left: 18px;
-        color: #6b7280;
-      }
-
-      .info li {
-        margin-bottom: 8px;
-        line-height: 1.5;
-      }
-
-      @media (max-width: 600px) {
-        .card {
-          padding: 28px;
-        }
-
-        h1 {
-          font-size: 24px;
-        }
-      }
-    </style>
-  </head>
-
-  <body>
-    <div class="container">
-      <div class="card">
-        <div class="header">
-          <span class="badge">OIDC Client Registration</span>
-
-          <h1>Register Your Application</h1>
-
-          <p class="subtitle">
-            Register your application to obtain a Client ID and Client Secret.
-            These credentials allow your application to authenticate users
-            through this OpenID Connect Provider.
-          </p>
+      <form>
+        <div class="form-group">
+          <label>Application Name</label>
+          <input type="text" id="applicationName" name="applicationName" placeholder="Example: Todo Manager" required />
+          <small>
+            A friendly name shown to users during authentication.
+          </small>
         </div>
 
-        <form>
-          <div class="form-group">
-            <label>Application Name</label>
-            <input type="text" id="applicationName" name="applicationName" placeholder="Example: Todo Manager" required />
-            <small>
-              A friendly name shown to users during authentication.
-            </small>
-          </div>
-
-          <div class="form-group">
-            <label>Application URL</label>
-            <input type="url" id="applicationUrl" name="applicationUrl" placeholder="https://example.com" required />
-            <small> The primary website of your application. </small>
-          </div>
-
-          <div class="form-group">
-            <label>Redirect URI</label>
-            <input
-              type="url"
-              placeholder="https://example.com/callback"
-              name="redirectUri"
-              id="redirectUri"
-              required
-            />
-            <small>
-              Users will be redirected to this URL after successful login.
-            </small>
-          </div>
-
-          <div class="actions">
-            <button type="submit">Register Application</button>
-          </div>
-        </form>
-
-        <div class="info">
-
-          <ul>
-            <li style="list-style: none;" id="client-id"></li>
-            <li style="list-style: none;" id="client-secret"></li>
-          </ul>
+        <div class="form-group">
+          <label>Application URL</label>
+          <input type="url" id="applicationUrl" name="applicationUrl" placeholder="https://example.com" required />
+          <small> The primary website of your application. </small>
         </div>
+
+        <div class="form-group">
+          <label>Redirect URI</label>
+          <input type="url" placeholder="https://example.com/callback" name="redirectUri" id="redirectUri" required />
+          <small>
+            Users will be redirected to this URL after successful login.
+          </small>
+        </div>
+
+        <div class="actions">
+          <button type="submit">Register Application</button>
+        </div>
+      </form>
+
+      <div class="info" style="display: none;">
+        <p id="error-message" style="color: #dc2626; display: none; font-weight: 500; margin: 0;"></p>
+        <ul id="credentials-list" style="display: none;">
+          <li style="list-style: none;" id="client-id"></li>
+          <li style="list-style: none;" id="client-secret"></li>
+        </ul>
       </div>
     </div>
+  </div>
 
-    <script>
+  <script>
 
-        // add evetn listeners to form submit , handle form
-        // make post requesr to rgister client endpoint to rgister client 
-        // call that from here 
+    // add event listener to form submit & handle it
+    // make a post request when form submitted and get the response
+    // if failed show error else show the client-id & secret
 
-        let applicationName = document.querySelector('#applicationName');
-        let applicationUrl = document.querySelector('#applicationUrl');
-        let redirectUri = document.querySelector('#redirectUri');
-        let clientIdElement = document.querySelector('#client-id');
-        let clientSecretElement = document.querySelector('#client-secret');
-        let form = document.querySelector('form')
+    let applicationName = document.querySelector('#applicationName');
+    let applicationUrl = document.querySelector('#applicationUrl');
+    let redirectUri = document.querySelector('#redirectUri');
+    let clientIdElement = document.querySelector('#client-id');
+    let clientSecretElement = document.querySelector('#client-secret');
+    let form = document.querySelector('form')
+    let infoDiv = document.querySelector('.info');
+    let errorMessageElement = document.querySelector('#error-message');
+    let credentialsList = document.querySelector('#credentials-list');
 
-        form.addEventListener('submit', async (e) => {
-          e.preventDefault();
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
 
-          let data = {
-            applicationName : applicationName.value,
-            applicationUrl : applicationUrl.value,
-            redirectUri : redirectUri.value,
-          }
+      let data = {
+        applicationName: applicationName.value,
+        applicationUrl: applicationUrl.value,
+        redirectUri: redirectUri.value,
+      }
 
-          try {
-            let rawResponse = await fetch(
-            '/registration',{
-              method:'POST',
-              headers:{
-                'Content-Type':'application/json'
-              },
-              body: JSON.stringify(data)
-            }
-          )
+      // Hide all result areas initially
+      infoDiv.style.display = "none";
+      errorMessageElement.style.display = "none";
+      credentialsList.style.display = "none";
 
-          let response = await rawResponse.json();
-          
-          clientIdElement.textContent = `Client ID - ${response.data.clientId}`
-          clientSecretElement.textContent = `Client Secret - ${response.data.clientSecret}`
+      try {
+        let rawResponse = await fetch(
+          '/registration', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        }
+        )
 
-        } catch (error) {
-            console.error('Error:', error.message)
-          }
-        })
-        
-    </script>
-  </body>
+        let response = await rawResponse.json();
+
+        if (!rawResponse.ok) {
+          errorMessageElement.textContent = `Error: ${response.message || "Registration failed"}`;
+          errorMessageElement.style.display = "block";
+          infoDiv.style.display = "block";
+          return;
+        }
+
+        clientIdElement.textContent = `Client ID - ${response.data.clientId}`
+        clientSecretElement.textContent = `Client Secret - ${response.data.clientSecret}`
+        credentialsList.style.display = "block";
+        infoDiv.style.display = "block";
+
+      } catch (error) {
+        console.error('Error :::', error.message)
+        errorMessageElement.textContent = `Network Error: ${error.message}`;
+        errorMessageElement.style.display = "block";
+        infoDiv.style.display = "block";
+      }
+    })
+
+  </script>
+</body>
+
 </html>
