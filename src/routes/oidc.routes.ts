@@ -11,6 +11,10 @@ import {
   postSignUpController,
 } from "../controllers/oidc.controller.js";
 import path from "node:path";
+import validate from "../middlewares/validate.middlewares.js";
+import LoginDTO from "../utils/DTO/dto/login.dto.js";
+import RegisterDTO from "../utils/DTO/dto/register.dto.js";
+import ClientDTO from "../utils/DTO/dto/client.dto.js";
 
 const ISSUER = "http://localhost:3000";
 
@@ -40,9 +44,11 @@ Router.get(
 
 Router.route("/authorize")
   .get(getAuthorizeController)
-  .post(postAuthorizeController);
+  .post(validate(LoginDTO), postAuthorizeController);
 
-Router.route("/signup").get(getSignUpController).post(postSignUpController);
+Router.route("/signup")
+  .get(getSignUpController)
+  .post(validate(RegisterDTO), postSignUpController);
 
 Router.get("/userinfo", userinfoController);
 
@@ -50,7 +56,7 @@ Router.post("/token", tokenController);
 
 Router.route("/registration")
   .get(getRegistrationController)
-  .post(postRegistrationController);
+  .post(validate(ClientDTO), postRegistrationController);
 
 Router.get("/jwks", jwksController);
 

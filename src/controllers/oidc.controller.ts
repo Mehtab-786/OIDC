@@ -13,12 +13,14 @@ import {
 } from "../utils/cert.js";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import { generateRandomString } from "../utils/jwtTokens.js";
+import APIError from "../utils/APIError.js";
+import APIResponse from "../utils/APIResponse.js";
 
 const ISSUER = "http://localhost:3000";
 const SALT = Number(process.env.SALT) || 10;
 
 async function getAuthorizeController(req: Request, res: Response) {
-  // get values from url
+  // get client_id & redirect_uri from url
   // check in db if exists both
   // if true redirect login page
   // else error page
@@ -48,32 +50,33 @@ async function postAuthorizeController(
   req: Request<{}, {}, PostAuthorizeBody>,
   res: Response,
 ) {
-  // login user
-  // take email, password & check it
-  // check in db
+  // get email, password, redirect_uri, client_id from request body
+  // check in database
   // redirect to redirect_uri with code
 
   const { email, password, redirect_uri, client_id } = req.body;
 
   if (!email || !password) {
-    return res.status(400).json({ message: "Missing credentials" });
+    throw APIError.notFound('Credentials are required!')
   }
 
   const [user] = await db.select().from(users).where(eq(users.email, email));
 
   if (!user) {
-    return res.status(400).json({ message: "Invalid credentials" });
+    throw APIError.unauthorized('Invalid Credentials!')
   }
 
   let isPassword = await bcrypt.compare(password, user.password);
 
   if (!isPassword) {
-    return res
-      .status(404)
-      .json({ message: "Email or password is incorrect!!" });
+    throw APIError.unauthorized('Invalid Credentials!')
   }
 
   const code = authorizationCode();
+
+  if (!code) {
+    throw APIError.internalError('Something went wrong!')
+  }
 
   await db.insert(authcode).values({
     clientId: client_id,
@@ -84,14 +87,11 @@ async function postAuthorizeController(
     used: false,
   });
 
-  return res.status(200).json({
-    message: "User logged in successfully",
-    data: {
-      username: user.username,
-      email: user.email,
-      code,
-    },
-  });
+  return APIResponse.ok(res, 'User logged in successfully', {
+    username: user.username,
+    email: user.email,
+    code,
+  })
 }
 
 async function getSignUpController(req: Request, res: Response) {
@@ -99,39 +99,32 @@ async function getSignUpController(req: Request, res: Response) {
   return res.sendFile(path.resolve("public", "SignUp.html"));
 }
 async function postSignUpController(req: Request, res: Response) {
-  // registering user
-  // username, password, email
-  // validation,
-  // check in db if already exists
+  // username, password, email, client_id, redirect_uri from request body
+  // validate values
+  // check in database if already exists
   // if not hash password
-  // insert in db
+  // insert in database
   // generate code
-  //  redirect user with code
+  // redirect user with code
 
   const { username, password, email, client_id, redirect_uri } = req.body;
 
   if (!username || !email || !password) {
-    return res.status(400).json({
-      message: "Email, password, & username required",
-    });
+    throw APIError.notFound('Credentials are required!')
   }
 
   if (!client_id || !redirect_uri) {
-    return res.status(400).json({
-      message: "You are not authorized to authenticate!",
-    });
+    throw APIError.unauthorized('You are not authorized to authenticate!')
   }
 
   const [existingUser] = await db
-    .select({ id: users.id }) // used id because only need to know user exists or no
+    .select({ id: users.id }) //only get used-id as data
     .from(users)
     .where(eq(users.email, email))
-    .limit(1); // it returns an array, that's why destructured
+    .limit(1); // it return only one data
 
   if (existingUser) {
-    return res.status(409).json({
-      message: "Account already exists",
-    });
+    throw APIError.conflict('Account already exists!')
   }
 
   const hashedPassword = await bcrypt.hash(password, SALT);
@@ -146,7 +139,7 @@ async function postSignUpController(req: Request, res: Response) {
     .returning();
 
   if (!userCreated) {
-    return res.status(500).json({ message: "Internal server error" });
+    throw APIError.internalError('Something went wrong!')
   }
 
   const code = await authorizationCode();
@@ -155,36 +148,32 @@ async function postSignUpController(req: Request, res: Response) {
     clientId: client_id,
     code,
     redirectUri: redirect_uri,
-    expiresAt: new Date(Date.now() + 5 * 60 * 1000), // ----------------------> uncoment it xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    // expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+    expiresAt: new Date(Date.now() + 5 * 60 * 1000),
     userId: userCreated.id,
     used: false,
   });
 
-  return res.status(200).json({
-    message: "User Signed up successfully",
-    data: {
-      username: userCreated.username,
-      email: userCreated.email,
-      code,
-    },
-  });
+  return APIResponse.created(res, 'User signed up successfully', {
+    username: userCreated.username,
+    email: userCreated.email,
+    code,
+  })
 }
 
 async function userinfoController(req: Request, res: Response) {
-  // get access token
-  // verify & return user details
+  // receive access token as Bearer token
+  // authenticate and return user details
 
   const authHeader = req.headers["authorization"]
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "Missing access token" });
+    throw APIError.notFound('Missing access token!')
   }
 
   const accessToken = authHeader.split(" ")[1];
 
   if (!accessToken) {
-    return res.status(401).json({ message: "Missing access token" });
+    throw APIError.unauthorized('Missing access token!')
   }
 
   const payload = jwt.verify(accessToken, PUBLIC_KEY, {
@@ -193,31 +182,21 @@ async function userinfoController(req: Request, res: Response) {
 
 
   if (payload.iss !== ISSUER) {
-    return res.status(401).json({ message: "Invalid issuer" });
+    throw APIError.unauthorized('Invalid issuer!')
   }
 
-
-  // if (payload.aud !== expectedClientId) {
-  //   return res.status(401).json({ message: "Invalid audience" });
-  // }
-
   if (!payload.sub) {
-    return res.status(401).json({ message: "Invalid subject" });
+    throw APIError.notFound('Invalid subject!')
   }
 
   let [user] = await db.select({ username: users.username, email: users.email }).from(users).where(eq(users.id, payload.sub))
 
   if (!user) {
-    return res.status(401).json({ message: "Invalid user" });
+    throw APIError.notFound('Invalid user!')
   }
 
-  // if(String(payload.sub) !== String(users.id)){
-  //   return res.status(401).json({ message: "Invalid id not matching" });
-  // }
-
-  return res.json({ message: "Access Token", userinfo: user })
+  return APIResponse.ok(res, 'Successfully fetched userinfo', user)
 }
-
 
 async function jwksController(req: Request, res: Response) {
   // show public keys, keep private keys
@@ -227,20 +206,19 @@ async function jwksController(req: Request, res: Response) {
   jwk.use = "sig";
   jwk.kid = "22f8c7201a4f789258f1e3a8ec364c33afa435f53c4a4ffeaf302113b4c93f4a";
 
-  return res.status(200).json({
-    keys: [jwk],
-  });
+  return APIResponse.ok(res, 'Successfully fetched JWKS', { keys: [jwk] })
 }
 
 async function tokenController(req: Request, res: Response) {
-  // get code , client id & secret, redirect uri in request body
-  // // return access & refresh token, id token, token type, expires in
-  // delete code from db
+  // get code, client_id & secret, redirect_uri from request body
+  // verify code, find user, client etc and validate
+  // generate access & refresh token, id_token, token_type, expires_in and return
+  // delete code from database
 
   const { code, client_id, client_secret, redirect_uri } = req.body;
 
   if (!code || !client_id || !client_secret || !redirect_uri) {
-    return res.status(404).json({ message: "Fields are missing!" });
+    throw APIError.notFound('Fields are missing!')
   }
 
   const [authorizeCode] = await db
@@ -250,18 +228,18 @@ async function tokenController(req: Request, res: Response) {
     .limit(1);
 
   if (!authorizeCode) {
-    return res.status(404).json({ message: "Authorization code is missing!" });
+    throw APIError.notFound('Authorization code is missing!')
   }
 
   if (Date.now() > authorizeCode.expiresAt.getTime()) {
-    return res.status(400).json({ message: "Authorization code has expired" });
+    throw APIError.badRequest('Authorization code has expired!')
   }
 
   if (
     authorizeCode.clientId !== client_id ||
     authorizeCode.redirectUri !== redirect_uri
   ) {
-    return res.status(400).json({ message: "Invalid Credentials !" });
+    throw APIError.unauthorized('Invalid Credentials!')
   }
 
   const [client] = await db
@@ -270,10 +248,10 @@ async function tokenController(req: Request, res: Response) {
     .where(eq(clients.clientSecret, client_secret));
 
   if (!client) {
-    return res.status(400).json({ message: "Invalid Credentials !" });
+    throw APIError.notFound('Invalid Credentials!')
   }
   if (client.client_id !== client_id) {
-    return res.status(400).json({ message: "Invalid Credentials !" });
+    throw APIError.unauthorized('Invalid Credentials!')
   }
 
   const payload = {
@@ -284,9 +262,9 @@ async function tokenController(req: Request, res: Response) {
 
   let access_token = await jwt.sign(payload, PRIVATE_KEY, {
     algorithm: "RS256",
-    expiresIn: "5m", //     ---------------> uncoment it xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx                                
-    // expiresIn: "1d", 
+    expiresIn: "5m"
   });
+
   let refresh_token = await generateRandomString();
   let token_type = "Bearer";
   let expires_in = 300;
@@ -307,15 +285,14 @@ async function tokenController(req: Request, res: Response) {
     sub: authorizeCode.userId,
     aud: authorizeCode.clientId,
     iat: now,
-    exp: now + 300, // 5 minutes ----------------------------------> uncomment it xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    // exp: now + 3000000, // 50 minutes
+    exp: now + 300
   };
 
   let id_token = await jwt.sign(idTokenPayload, PRIVATE_KEY, { algorithm: 'RS256' })
 
-  return res.status(200).json({
+  return APIResponse.ok(res, 'Tokens generated successfully', {
     access_token,
-    refresh_token: refresh_token,
+    refresh_token,
     id_token,
     token_type,
     expires_in,
@@ -327,19 +304,25 @@ async function getRegistrationController(req: Request, res: Response) {
   return res.sendFile(path.resolve("public", "ClientRegistration.html"));
 }
 async function postRegistrationController(req: Request, res: Response) {
+  // client will register themselves here 
+  // validate input values
+  // if already exists then error,
+  // else create one
+
   const { applicationName, applicationUrl, redirectUri } = req.body;
 
   if (!applicationName || !applicationUrl || !redirectUri) {
-    return res.status(400).json({ message: "Missing required fields" });
+    throw APIError.notFound("Missing required fields")
   }
 
   const isClient = await db
-    .select()
+    .select({ id: clients.id })
     .from(clients)
-    .where(eq(clients.applicationName, applicationName));
+    .where(eq(clients.applicationName, applicationName))
+    .limit(1);
 
   if (isClient.length > 0) {
-    return res.status(400).json({ message: "Client already exists" });
+    throw APIError.conflict("Client already exists");
   }
 
   const { clientId, clientSecret } = generateClientCredentials();
@@ -353,19 +336,13 @@ async function postRegistrationController(req: Request, res: Response) {
   });
 
   if (!newClient) {
-    return res.status(500).json({ message: "Internal server error" });
+    throw APIError.internalError("Something went wrong!");
   }
 
-  res.status(200).json({
-    messaga: "Client registered",
-    data: {
-      clientId,
-      clientSecret,
-    },
+  return APIResponse.created(res, "Client registered", {
+    clientId,
+    clientSecret,
   });
-
-  // get app name, url, redirect uri etc
-  // return cient ID & secret
 }
 
 export {
