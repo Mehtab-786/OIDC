@@ -1,5 +1,4 @@
-import { boolean } from "drizzle-orm/cockroach-core";
-import { pgTable, uuid, varchar, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, uuid, varchar, timestamp, boolean } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
   id: uuid().primaryKey().defaultRandom(),
@@ -27,17 +26,17 @@ export const clients = pgTable("clients", {
 
 export const authcode = pgTable("authcode", {
   id: uuid().primaryKey().defaultRandom(),
-  code: varchar({length:80}).notNull().unique(),
+  code: varchar({ length: 80 }).notNull().unique(),
   userId: uuid("user_id").notNull(),
   clientId: varchar("client_id", { length: 255 }).notNull(),
   redirectUri: varchar("redirect_uri", { length: 255 }).notNull(),
-  used:boolean().default(false),
+  used: boolean().default(false),
   expiresAt: timestamp("expires_at").notNull(),
 });
 
 export const refreshtoken = pgTable("refreshtoken", {
   id: uuid("id").primaryKey().defaultRandom(),
-  token: varchar("token",{length:255}).notNull().unique(),
+  token: varchar("token", { length: 255 }).notNull().unique(),
   userId: uuid("user_id").notNull(),
   clientId: varchar("client_id", { length: 255 }).notNull(),
   expiresAt: timestamp("expires_at").notNull(),

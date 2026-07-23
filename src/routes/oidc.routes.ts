@@ -16,7 +16,7 @@ import LoginDTO from "../utils/DTO/dto/login.dto.js";
 import RegisterDTO from "../utils/DTO/dto/register.dto.js";
 import ClientDTO from "../utils/DTO/dto/client.dto.js";
 
-const ISSUER = "http://localhost:3000";
+const ISSUER = process.env.ISSUER_URL;
 
 const Router = express.Router();
 

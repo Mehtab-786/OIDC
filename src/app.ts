@@ -2,8 +2,11 @@
 import express from "express";
 import path from "node:path";
 import oidcRoutes from "./routes/oidc.routes.js";
+import cors from 'cors';
 
 const app = express();
+
+app.use(cors());
 
 app.use(express.static(path.resolve("public")));
 app.use(express.json());

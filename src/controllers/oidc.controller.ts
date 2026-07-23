@@ -16,7 +16,7 @@ import { generateRandomString } from "../utils/jwtTokens.js";
 import APIError from "../utils/APIError.js";
 import APIResponse from "../utils/APIResponse.js";
 
-const ISSUER = "http://localhost:3000";
+const ISSUER = process.env.ISSUER_URL;
 const SALT = Number(process.env.SALT) || 10;
 
 async function getAuthorizeController(req: Request, res: Response) {
